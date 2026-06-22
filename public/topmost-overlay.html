@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manico Topmost Marker</title>
+    <style>
+      :root {
+        --marker-color: #ef4444;
+        --marker-width: 6px;
+        --marker-glow: 24px;
+        --marker-opacity: .9;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+        background: transparent;
+        pointer-events: none;
+      }
+
+      body {
+        position: relative;
+      }
+
+      .marker {
+        position: absolute;
+        inset: calc(var(--marker-glow) + var(--marker-width) + 7px);
+        border: var(--marker-width) solid var(--marker-color);
+        border-radius: 10px;
+        opacity: var(--marker-opacity);
+        box-shadow:
+          0 0 var(--marker-glow) color-mix(in srgb, var(--marker-color) 72%, transparent),
+          0 0 calc(var(--marker-glow) * 1.9) color-mix(in srgb, var(--marker-color) 34%, transparent),
+          inset 0 0 calc(var(--marker-width) * 1.4) color-mix(in srgb, var(--marker-color) 18%, transparent);
+      }
+
+      .marker::before,
+      .marker::after {
+        content: "";
+        position: absolute;
+        inset: calc((var(--marker-glow) * -.46) - 2px);
+        border-radius: 16px;
+        border: 1px solid color-mix(in srgb, var(--marker-color) 42%, transparent);
+        filter: blur(7px);
+      }
+
+      .marker::after {
+        inset: calc((var(--marker-glow) * -.9) - 4px);
+        opacity: .42;
+        filter: blur(15px);
+      }
+
+      body[data-marker-style="line"] .marker {
+        box-shadow: none;
+      }
+
+      body[data-marker-style="line"] .marker::before,
+      body[data-marker-style="line"] .marker::after {
+        display: none;
+      }
+
+      body[data-marker-style="pulse"] .marker {
+        animation: marker-pulse 1.7s ease-in-out infinite;
+      }
+
+      @keyframes marker-pulse {
+        0%,
+        100% {
+          box-shadow:
+            0 0 calc(var(--marker-glow) * .55) color-mix(in srgb, var(--marker-color) 54%, transparent),
+            0 0 var(--marker-glow) color-mix(in srgb, var(--marker-color) 24%, transparent),
+            inset 0 0 calc(var(--marker-width) * 1.1) color-mix(in srgb, var(--marker-color) 14%, transparent);
+        }
+
+        50% {
+          box-shadow:
+            0 0 var(--marker-glow) color-mix(in srgb, var(--marker-color) 84%, transparent),
+            0 0 calc(var(--marker-glow) * 2.25) color-mix(in srgb, var(--marker-color) 42%, transparent),
+            inset 0 0 calc(var(--marker-width) * 1.8) color-mix(in srgb, var(--marker-color) 22%, transparent);
+        }
+      }
+    </style>
+  </head>
+  <body data-marker-style="glow">
+    <div class="marker" aria-hidden="true"></div>
+    <script>
+      window.__MANICO_APPLY_MARKER_OPTIONS__ = (options = {}) => {
+        const root = document.documentElement;
+        const color = options.marker_color || "#ef4444";
+        const width = Number(options.border_width || 6);
+        const glow = Number(options.glow_size || 24);
+        const opacity = Number(options.opacity || 0.9);
+        const style = options.marker_style || "glow";
+
+        root.style.setProperty("--marker-color", color);
+        root.style.setProperty("--marker-width", `${Math.max(1, Math.min(12, width))}px`);
+        root.style.setProperty("--marker-glow", `${Math.max(0, Math.min(40, glow))}px`);
+        root.style.setProperty("--marker-opacity", String(Math.max(0.2, Math.min(1, opacity))));
+        document.body.dataset.markerStyle = ["line", "glow", "pulse"].includes(style) ? style : "glow";
+      };
+
+      window.__MANICO_APPLY_MARKER_OPTIONS__(window.__MANICO_MARKER_OPTIONS__ || {});
+    </script>
+  </body>
+</html>
